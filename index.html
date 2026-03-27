@@ -4,140 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DropLevel – Gamified Airdrop Hunting 2026</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
-    :root {
-      --neon-purple: #a855f7;
-      --neon-cyan: #06b6d4;
-      --neon-green: #10b981;
-      --neon-yellow: #eab308;
-      --neon-red: #dc2626;
-      --bg-dark: #030712;
+    body { background: #000; color: #fff; font-family: 'Courier New', monospace; margin: 0; overflow-x: hidden; }
+    canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .neon-green { color: #00ff41; text-shadow: 0 0 10px #00ff41; }
+    .drop-yellow { color: #ffff00; text-shadow: 0 0 10px #ffff00; }
+    .level-red { color: #ff0000; text-shadow: 0 0 10px #ff0000; }
+    .level-card:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,65,0.3); }
+    .floating-notif { 
+      position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.85); 
+      border: 1px solid #00ff41; border-radius: 12px; padding: 12px 20px; 
+      display: flex; align-items: center; gap: 12px; z-index: 999; opacity: 0; 
+      transform: translateY(20px); transition: all 0.5s ease; 
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: var(--bg-dark);
-      color: #f1f5f9;
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
-    }
-    canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-
-    /* NAV */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 16px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(3,7,18,0.9);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .nav-logo {
-      font-family: 'Orbitron', monospace;
-      font-weight: 900;
-      font-size: 1.4rem;
-      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 120px 20px 80px;
-    }
-    .hero-title {
-      font-family: 'Orbitron', monospace;
-      font-size: clamp(2.8rem, 8vw, 5.5rem);
-      font-weight: 900;
-      line-height: 1.05;
-      margin-bottom: 16px;
-    }
-    .drop-yellow { color: var(--neon-yellow); }
-    .level-red { color: var(--neon-red); }
-    .hero-subtitle {
-      font-size: 1.25rem;
-      color: #94a3b8;
-      max-width: 620px;
-      margin: 0 auto 24px;
-    }
-    .hero-urgency {
-      background: rgba(220,38,38,0.1);
-      border: 1px solid rgba(220,38,38,0.3);
-      padding: 10px 24px;
-      border-radius: 50px;
-      margin-bottom: 32px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    /* LEVELS */
-    .levels-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .level-card {
-      background: rgba(15,20,40,0.85);
-      border-radius: 20px;
-      padding: 32px;
-      border: 1px solid rgba(255,255,255,0.08);
-      transition: all 0.3s;
-    }
-    .level-card:hover { transform: translateY(-8px); }
-    .level-1 { border-color: #444; }
-    .level-2 { border-color: var(--neon-yellow); }
-    .level-3 { border-color: var(--neon-red); background: linear-gradient(135deg, rgba(40,10,10,0.9), rgba(15,20,40,0.85)); }
-
-    /* WAITLIST */
-    .waitlist-box {
-      max-width: 660px;
-      margin: 0 auto;
-      background: rgba(15,20,40,0.9);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 28px;
-      padding: 52px 40px;
-      text-align: center;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
-      color: white;
-      padding: 18px 44px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 1.1rem;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 0 30px rgba(168,85,247,0.5);
-    }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
-      color: white;
-      padding: 16px 28px;
-      border-radius: 50px;
-      font-weight: 700;
-      z-index: 9999;
-      box-shadow: 0 0 40px rgba(139,92,246,0.6);
-      animation: toastPop 2.2s ease forwards;
+    .floating-notif.show { opacity: 1; transform: translateY(0); }
+    .toast { 
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4); color: white; 
+      padding: 16px 28px; border-radius: 50px; font-weight: 700; z-index: 9999; 
+      box-shadow: 0 0 40px rgba(139,92,246,0.6); animation: toastPop 2s ease forwards; 
     }
     @keyframes toastPop {
       0% { opacity: 0; transform: translate(-50%, -60%) scale(0.8); }
@@ -151,110 +37,114 @@
 
   <canvas id="canvas-bg"></canvas>
 
-  <!-- NAV -->
-  <nav>
-    <div class="nav-logo">DROPLEVEL</div>
-  </nav>
-
-  <!-- HERO -->
-  <section class="hero">
-    <h1 class="hero-title">
-      <span class="drop-yellow">DROP</span><span class="level-red">LEVEL</span>
+  <!-- Hero -->
+  <header class="py-24 text-center relative z-10">
+    <h1 class="text-6xl md:text-7xl font-extrabold">
+      <span class="drop-yellow">drop</span><span class="level-red">level</span>
     </h1>
-    <p class="hero-subtitle">
-      Gamified Airdrop Hunting 2026<br>
-      Levels 1-3 + AI loops to 10x your points
-    </p>
-
-    <div class="hero-urgency">
-      🔥 Launch in 30 days — First 500 get <strong>Level 3 FREE</strong>
-    </div>
-
-    <button onclick="document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})" class="btn-primary">
+    <p class="text-3xl mt-4 neon-green">Gamified Airdrop Hunting 2026</p>
+    <p class="text-xl mt-6 max-w-3xl mx-auto">Levels 1-3 + AI loops to 10x your points. Waitlist open – Level 3 FREE for first 500!</p>
+    
+    <button onclick="window.open('https://forms.gle/tYhLN11M5i5K1yJk7', '_blank')" 
+            class="mt-10 bg-green-600 hover:bg-green-500 text-black font-bold py-4 px-12 rounded-full text-2xl transition">
       Join Waitlist Free
     </button>
-  </section>
+  </header>
 
-  <!-- LEVELS -->
-  <section class="levels-section">
-    <div class="levels-grid">
-      <div class="level-card level-1">
-        <h3>Level 1 — Rookie Hunter</h3>
-        <p>Basic swaps & simple quests</p>
-      </div>
-      <div class="level-card level-2">
-        <h3>Level 2 — Crypto Scout</h3>
-        <p>LP, referrals & intermediate loops</p>
-      </div>
-      <div class="level-card level-3">
-        <h3>Level 3 — Airdrop Legend</h3>
-        <p>Full ecosystem + AI coach</p>
+  <!-- Levels -->
+  <section class="py-20 bg-gray-900 relative z-10">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-5xl font-bold text-center neon-green mb-16">3 Levels to Master Farming</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div class="level-card p-10 rounded-xl border-4 text-center">
+          <div class="text-4xl font-bold mb-6">Level 1</div>
+          <p class="text-lg">Basic swaps & simple quests</p>
+        </div>
+        <div class="level-card p-10 rounded-xl border-4 text-center scale-105 shadow-2xl">
+          <div class="text-4xl font-bold mb-6">Level 2</div>
+          <p class="text-lg">LP, referrals & intermediate loops</p>
+        </div>
+        <div class="level-card p-10 rounded-xl border-4 text-center">
+          <div class="text-4xl font-bold mb-6">Level 3</div>
+          <p class="text-lg">Full ecosystem + AI coach</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- WAITLIST -->
-  <section id="waitlist" class="waitlist-box">
-    <h2>Join the Waitlist</h2>
-    <p>First 500 members get Level 3 for FREE</p>
-    <button onclick="window.open('https://forms.gle/TON-LIEN-GOOGLE', '_blank')" class="btn-primary" style="margin-top:20px;">
+  <!-- Waitlist -->
+  <section id="waitlist" class="py-24 bg-black text-center relative z-10">
+    <h2 class="text-5xl font-bold neon-green mb-8">Join the Waitlist Now</h2>
+    <p class="text-2xl mb-12">Launch in 30 days – First 500 get Level 3 FREE</p>
+    <button onclick="window.open('https://forms.gle/tYhLN11M5i5K1yJk7', '_blank')" 
+            class="bg-green-600 hover:bg-green-500 text-black font-bold py-5 px-12 rounded-full text-2xl transition">
       Join Waitlist Free
     </button>
   </section>
+
+  <!-- Floating notif -->
+  <div id="floating-notif" class="floating-notif hidden">
+    <span class="text-2xl">🚀</span>
+    <span><strong>0xAlpha</strong> just joined <span class="text-gray-400">2 min ago</span></span>
+  </div>
 
   <script>
-    // Simple particles
+    // Particles
     const canvas = document.getElementById('canvas-bg');
     const ctx = canvas.getContext('2d');
-    let particles = [];
-    const symbols = ['₿','Ξ','◎','⬡','✦','⬢'];
+    let w, h, particles = [];
+    const symbols = ['₿', 'Ξ', '◎', '⬡', '✦', '⬢'];
+    const colors = ['rgba(139,92,246,0.6)', 'rgba(6,182,212,0.6)', 'rgba(16,185,129,0.5)'];
 
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+    function createParticle() {
+      return {
+        x: Math.random() * w,
+        y: Math.random() * h,
+        size: Math.random() * 14 + 8,
+        speedX: (Math.random() - 0.5) * 0.4,
+        speedY: -Math.random() * 0.6 - 0.2,
+        opacity: Math.random() * 0.5 + 0.1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        symbol: symbols[Math.floor(Math.random() * symbols.length)]
+      };
     }
-    resize();
-    window.addEventListener('resize', resize);
-
-    class Particle {
-      constructor() {
-        this.reset();
-      }
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.6;
-        this.vy = (Math.random() - 0.5) * 0.6;
-        this.size = Math.random() * 14 + 8;
-        this.symbol = symbols[Math.floor(Math.random()*symbols.length)];
-      }
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-      }
-      draw() {
-        ctx.fillStyle = 'rgba(168,85,247,0.6)';
-        ctx.font = `${this.size}px Arial`;
-        ctx.fillText(this.symbol, this.x, this.y);
-      }
-    }
-
-    for (let i = 0; i < 45; i++) particles.push(new Particle());
-
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function init() { resize(); particles = Array.from({length: 50}, createParticle); }
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
       particles.forEach(p => {
-        p.update();
-        p.draw();
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.opacity;
+        ctx.font = `${p.size}px Arial`;
+        ctx.fillText(p.symbol, p.x, p.y);
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.y < -20 || p.x < -20 || p.x > w + 20) Object.assign(p, createParticle());
       });
-      requestAnimationFrame(animate);
     }
-    animate();
+    function loop() { draw(); requestAnimationFrame(loop); }
+    init(); loop();
 
-    // Toast on button click
-    document.querySelectorAll('.btn-primary').forEach(btn => {
+    // Floating notif
+    const notifs = [
+      { name: '0xAlpha', time: '2 min ago', icon: '🚀' },
+      { name: 'CryptoNinja', time: '4 min ago', icon: '⚡' },
+      { name: 'MoonHunter', time: '7 min ago', icon: '🌙' }
+    ];
+    let idx = 0;
+    function showNotif() {
+      const el = document.getElementById('floating-notif');
+      const d = notifs[idx];
+      el.innerHTML = `<span class="text-2xl">${d.icon}</span><span><strong>${d.name}</strong> just joined <span class="text-gray-400">${d.time}</span></span>`;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 4500);
+      idx = (idx + 1) % notifs.length;
+    }
+    setInterval(showNotif, 16000);
+    showNotif();
+
+    // Toast XP
+    document.querySelectorAll('button').forEach(btn => {
       btn.addEventListener('click', () => {
         const toast = document.createElement('div');
         toast.className = 'toast';
